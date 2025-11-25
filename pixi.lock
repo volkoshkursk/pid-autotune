@@ -1326,7 +1326,7 @@ packages:
 - pypi: ./
   name: pid-autotune
   version: 0.1.0
-  sha256: 6c6709b556196e8088e78649619382ab45e9d1d7dacf89f6a8897b117fdedb71
+  sha256: f25cdd291d067b0f5f8729dc1ce204381dd55566c8f7e6a870c5792b45e8b4b6
   requires_python: '>=3.11'
   editable: true
 - conda: https://conda.anaconda.org/conda-forge/linux-64/pillow-12.0.0-py314h835adc0_1.conda

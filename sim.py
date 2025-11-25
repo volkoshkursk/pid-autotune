@@ -1,8 +1,8 @@
 #!/bin/python3
 
-from pid import PIDArduino
-from autotune import PIDAutotune
-from kettle import Kettle
+from pid_autotune.pid import PIDArduino
+from pid_autotune.autotune import PIDAutotune
+from pid_autotune.kettle import Kettle
 from collections import deque, namedtuple
 import sys
 import math

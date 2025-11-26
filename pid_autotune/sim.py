@@ -9,7 +9,6 @@ import math
 import logging
 import matplotlib.pyplot as plt
 from typing import Dict
-from argparse import Namespace
 
 
 LOG_FORMAT = '%(name)s: %(message)s'
@@ -20,7 +19,8 @@ Simulation = namedtuple(
 Arg_nt = namedtuple("Args", ["pid", "autotune", "verbose", "export", "noplot", 
                              "kettle_temp", "setpoint", "ambient_temp", "interval", 
                              "delay", "sampletime", "volume", "diameter", 
-                             "heater_power", "heat_loss_factor", "out_min", "out_max"])
+                             "heater_power", "heat_loss_factor", "out_min", "out_max", 
+                             "json_output"])
 
 def write_csv(sim):
     filename = sim.name + '.csv'
@@ -30,6 +30,18 @@ def write_csv(sim):
         for i in range(0, len(sim.timestamps)):
             csv.write('{0};{1:.2f};{2:.2f};{3:.2f}\n'.format(
                 sim.timestamps[i], sim.outputs[i], sim.sensor_temps[i], sim.heater_temps[i]))
+
+def generate_result_by_sims(sims):
+    return {sim.name: 
+            {
+                'data': {
+                    'timestamp': sim.timestamps,
+                    'output': [x for x in sim.outputs],
+                    'sensor_temp': [x for x in sim.sensor_temps], 
+                    'heater_temp': [x for x in sim.heater_temps]
+                }
+            }
+        for sim in sims}
 
 
 def sim_update(sim, timestamp, output, args):
@@ -178,22 +190,24 @@ def simulate_pid(args):
             output = min(output, 100)
             sim_update(sim, timestamp, output, args)
 
-            if args.verbose > 0:
+            if args.verbose > 0 and not args.json_output:
                 print('time:    {0} sec'.format(timestamp))
                 print('{0}: {1:.2f}%'.format(sim.name, output))
                 print('temp sensor:    {0:.2f}°C'.format(sim.sensor_temps[-1]))
                 print('temp heater:    {0:.2f}°C'.format(sim.heater_temps[-1]))
-        if args.verbose > 0:
+        if args.verbose > 0 and not args.json_output:
             print()
 
     if args.export:
         for sim in sims:
             write_csv(sim)
 
-    if not args.noplot:
+    if not (args.noplot or args.json_output):
         title = 'PID simulation, {0:.1f}l kettle, {1:.1f}kW heater, {2:.1f}s delay'.format(
             args.volume, args.heater_power, args.delay)
         plot_simulations(args, sims, title)
+    if args.json_output:
+        return generate_result_by_sims(sims)
 
 
 def run(cfg: Dict):
@@ -202,6 +216,6 @@ def run(cfg: Dict):
     if args.verbose > 1:
         logging.basicConfig(stream=sys.stderr, format=LOG_FORMAT, level=logging.DEBUG)
     if args.autotune:
-        simulate_autotune(args)
+        return simulate_autotune(args)
     if args.pid is not None:
-        simulate_pid(args)
+        return simulate_pid(args)

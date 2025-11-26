@@ -1,7 +1,7 @@
 [project]
 authors = [{name = "hirschmann"},
            {name = "Volkoshkursk", email = "zaz-pagani@inbox.ru"}]
-dependencies = []
+dependencies = ["matplotlib>=3.10,<4"]
 name = "pid-autotune"
 requires-python = ">= 3.11"
 version = "0.1.0"
@@ -19,5 +19,3 @@ pid_autotune = { path = ".", editable = true }
 
 [tool.pixi.tasks]
 
-[tool.pixi.dependencies]
-matplotlib = ">=3.10.8,<4"
